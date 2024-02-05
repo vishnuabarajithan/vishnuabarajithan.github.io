@@ -55,16 +55,12 @@
                         };
                         tableData.push(rowData);
                     }
-                    table.appendRows(tableData);
-                } else {
-                    console.error("Error: No data found in the response.");
-                }
-
+		}
+                table.appendRows(tableData);
                 doneCallback();
             },
             error: function (xhr, status, error) {
                 console.error("Error fetching data:", error);
-                alert("Error: Unable to fetch data. Please check your API key and input values and try again.");
                 doneCallback();
             }
         });
