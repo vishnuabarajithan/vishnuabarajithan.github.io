@@ -31,10 +31,24 @@
 
     // Download the data
     myConnector.getData = function (table, doneCallback) {
-        var apiKey = tableau.connectionData; // Retrieve API key from connectionData
+        var apiKey = tableau.connectionData.apiKey; // Retrieve API key from the connection data
+        var latitude = tableau.connectionData.latitude; // Retrieve latitude from the connection data
+        var longitude = tableau.connectionData.longitude; // Retrieve longitude from the connection data
+
+        console.log("Latitude:", latitude);
+        console.log("apiKey:", apiKey);
+        console.log("Longitude:", longitude);
+
+        // Validate latitude and longitude as decimal numbers
+        if (!isValidDecimal(latitude) || !isValidDecimal(longitude)) {
+            alert("Error: Latitude and Longitude must be valid decimal numbers.");
+            doneCallback();
+            return;
+        }
 
         $.ajax({
-            url: "https://api.tomorrow.io/v4/timelines?location=42.3478%2C%20-71.0466&fields=cloudCeiling,dewPoint,pressureSurfaceLevel&units=metric&apikey=" + apiKey,
+            url: "https://api.tomorrow.io/v4/timelines?location=" + latitude + "%2C%20" + longitude + "&fields=cloudCeiling,dewPoint,pressureSurfaceLevel&units=metric&apikey=" + apiKey,
+	    
             type: "GET",
             dataType: "json",
             success: function (resp, status, xhr) {
@@ -62,27 +76,43 @@
                     doneCallback();
                 } else {
                     console.error("Error fetching data. HTTP status code:", xhr.status);
-                    alert("Unable to fetch data. Please enter a valid API Key.");
+                    alert("Error: Unable to fetch data. Please check your API key and input values and try again.");
                     doneCallback();
                 }
             },
             error: function (xhr, status, error) {
                 console.error("Error fetching data:", error);
-                alert("Unable to fetch data. Please enter a valid API Key.");
+                alert("Unable to fetch data. Please check your API key and input values and try again.");
                 doneCallback();
             }
         });
     };
 
+    // Helper function to check if a value is a valid decimal number
+    function isValidDecimal(value) {
+        return !isNaN(parseFloat(value));
+    }
+
     tableau.registerConnector(myConnector);
 
-    // Create event listeners for when the user submits the form
+    // Create event listener for when the user submits the form
     $(document).ready(function () {
         $("#submitButton").click(function () {
-            var apiKey = $("#apiKey").val(); // Retrieve API key from the input field
-            tableau.connectionName = "tomorrowio"; // This will be the data source name in Tableau
-            tableau.connectionData = apiKey; // Pass the API key to connectionData
-            tableau.submit(); // This sends the connector object to Tableau
+            // Retrieve values from input fields
+            var apiKey = $("#apiKey").val();
+            var latitude = $("#latitude").val();
+            var longitude = $("#longitude").val();
+
+            // Set connection name and data
+            tableau.connectionName = "tomorrowio";
+            tableau.connectionData = {
+                apiKey: apiKey,
+                latitude: latitude,
+                longitude: longitude
+            };
+
+            // Submit the connector object to Tableau
+            tableau.submit();
         });
     });
 })();
