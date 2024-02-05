@@ -35,9 +35,7 @@
         var latitude = tableau.connectionData.latitude; // Retrieve latitude from the connection data
         var longitude = tableau.connectionData.longitude; // Retrieve longitude from the connection data
 
-        console.log("Latitude:", latitude);
-        console.log("apiKey:", apiKey);
-        console.log("Longitude:", longitude);
+        
 
         // Validate latitude and longitude as decimal numbers
         if (!isValidDecimal(latitude) || !isValidDecimal(longitude)) {
